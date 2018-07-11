@@ -19,6 +19,9 @@ package com.componentcorp.xml.validation;
 import com.componentcorp.xml.validation.base.FeaturePropertyProvider;
 import com.componentcorp.xml.validation.base.LifecycleSchema;
 import com.componentcorp.xml.validation.base.ValidatorHandlerConstructionCallback;
+
+import jim.test.Jim;
+
 import javax.xml.validation.Validator;
 import javax.xml.validation.ValidatorHandler;
 
@@ -39,11 +42,13 @@ public class IntrinsicSchema extends LifecycleSchema{
 
     @Override
     public Validator newValidator() {
+    	Jim.trace("IntrinsicSchema newValidator");
         return new IntrinsicValidator(parent,new FeaturePropertyProviderImpl(featuresAndProperties));
     }
 
     @Override
     public ValidatorHandler newValidatorHandlerInternal() {
+    	Jim.trace("IntrinsicSchema newValidator");
         return new IntrinsicValidatorHandler(new FeaturePropertyProviderImpl(featuresAndProperties));
     }
 

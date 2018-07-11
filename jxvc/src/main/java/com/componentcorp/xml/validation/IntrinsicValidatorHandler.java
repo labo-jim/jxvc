@@ -18,6 +18,9 @@ package com.componentcorp.xml.validation;
 
 import com.componentcorp.xml.validation.base.ChainableDeclHandler;
 import com.componentcorp.xml.validation.base.ProcessingInstructionParser;
+
+import jim.test.Jim;
+
 import com.componentcorp.xml.validation.base.FeaturePropertyProvider;
 import java.io.InputStream;
 import java.io.Reader;
@@ -189,7 +192,12 @@ public class IntrinsicValidatorHandler extends ValidatorHandler implements  Decl
     }
 
     public void startDocument() throws SAXException {
-        reset();
+    	// JIM
+    	String msg = "intrisicValHandler startDocument validators \n";
+    	String msgList = msg + currentOrderedValidators.toString();
+    	Jim.stackTrace(msgList);
+        
+    	reset();
         deferredActions.add(new BaseDeferredAction() {
             public void perform() throws SAXException{
                 startDocumentInternal();
@@ -251,6 +259,12 @@ public class IntrinsicValidatorHandler extends ValidatorHandler implements  Decl
 //        handleElement(uri, localName, qName, atts);
         if (!firstElementPassed){
             handleRootElement(uri,localName,qName,atts);
+            
+            // >>> JIM
+        	String msg = "intrisicValHandler startElement FIRST ELEMENT validators \n";
+        	String msgList = msg + currentOrderedValidators.toString();
+        	Jim.stackTrace(msgList);
+        	// <<< JIM
         }
         firstContentHandler.startElement(uri, localName, qName, atts);
     }
@@ -1032,6 +1046,10 @@ public class IntrinsicValidatorHandler extends ValidatorHandler implements  Decl
         }
 
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
+        	String jimPrefixMsg = "HA! Sax2DefaultHandlerWrapper prefix mapping \n prefix : ";
+        	String jimPrefixMsg2 = jimPrefixMsg + prefix + " - URI : " + uri;
+        	Jim.stackTrace(jimPrefixMsg2 + "\n et ddonc paf !" + asContentHandler.getClass().getName());
+        	
             if (asContentHandler!=null){
                 asContentHandler.startPrefixMapping(prefix, uri);
             }
@@ -1044,6 +1062,11 @@ public class IntrinsicValidatorHandler extends ValidatorHandler implements  Decl
         }
 
         public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+        	// >>> JIM
+        	for(int jimI = 0; jimI < atts.getLength(); jimI++){
+        		Jim.stackTrace("\tATTRIBUTE : @" + atts.getQName(jimI) + "=\""+ atts.getValue(jimI) + "\"\n");
+        	}
+        	// <<< JIM
             if (asContentHandler!=null){
                 asContentHandler.startElement(uri, localName, qName, atts);
             }

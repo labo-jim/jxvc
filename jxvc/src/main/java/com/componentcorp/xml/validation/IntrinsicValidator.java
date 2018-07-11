@@ -17,6 +17,9 @@
 package com.componentcorp.xml.validation;
 
 import com.componentcorp.xml.validation.base.FeaturePropertyProvider;
+
+import jim.test.Jim;
+
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -106,10 +109,18 @@ public class IntrinsicValidator extends Validator implements FeaturePropertyProv
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             parserFactory.setNamespaceAware(featuresAndProperties.getFeature(ValidationConstants.FEATURE_NAMESPACE_AWARE));
             
+            // >>> JIM
+            String NSmsg = "is intrinsicValidator 's PasrerFactory NS aware ? => ";
+            Jim.trace(NSmsg + parserFactory.isNamespaceAware());
+            
+            String schemaMsg = "the provided schema : ";
+            Jim.trace(schemaMsg + schema.getClass().getName());
+            // <<< JIM
             
             parserFactory.setSchema(schema);
             //ValidatorHandler intrinsicValidator = schema.newValidatorHandler();
             SAXParser parser = parserFactory.newSAXParser();
+          
             
             
             XMLReader xmlReader = parser.getXMLReader();
@@ -117,7 +128,9 @@ public class IntrinsicValidator extends Validator implements FeaturePropertyProv
 //            xmlReader.setDTDHandler(intrinsicValidator);
             xmlReader.setEntityResolver(new LSResourceResolverWrapper(resourceResolver));
             xmlReader.setErrorHandler(new MonitoringErrorHandler(errorHandler));
+            Jim.trace("IntrinsicValidator, je vais parser...");
             xmlReader.parse(inputSource);
+            Jim.trace("IntrinsicValidator, apres parse! (sans Exception)");
         } catch (ParserConfigurationException ex) {
             throw new SAXException(ex);
         }
@@ -190,7 +203,13 @@ public class IntrinsicValidator extends Validator implements FeaturePropertyProv
         }
 
         public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
-            LSInput input= wrapped.resolveResource("http://www.w3.org/TR/REC-xml", name, publicId, systemId, baseURI);
+           Jim.stackTrace("Je resous "
+        		   	+ Jim.explain(name)
+        		   	+ Jim.explain(publicId)
+        		   	+ Jim.explain(baseURI)
+        		   	+ Jim.explain(systemId));
+           
+        	LSInput input= wrapped.resolveResource("http://www.w3.org/TR/REC-xml", name, publicId, systemId, baseURI);
             if (input !=null){
                 InputSource result = new InputSource();
                 result.setByteStream(input.getByteStream());
@@ -227,6 +246,7 @@ public class IntrinsicValidator extends Validator implements FeaturePropertyProv
         }
 
         public void warning(SAXParseException exception) throws SAXException {
+        	Jim.stackTrace("MonitoringErrorHandler warning :\n\t" + exception.getMessage());
             if (wrappedHandler!=null){
                 wrappedHandler.warning(exception);
             }
@@ -236,6 +256,7 @@ public class IntrinsicValidator extends Validator implements FeaturePropertyProv
         }
 
         public void error(SAXParseException exception) throws SAXException {
+        	Jim.stackTrace("MonitoringErrorHandler error : \n\t" + exception.getMessage());
             if (wrappedHandler!=null){
                 wrappedHandler.error(exception);
             }
@@ -245,6 +266,7 @@ public class IntrinsicValidator extends Validator implements FeaturePropertyProv
         }
 
         public void fatalError(SAXParseException exception) throws SAXException {
+        	Jim.stackTrace("MonitoringErrorHandler fatalError :\n\t" + exception.getMessage());
             if (wrappedHandler!=null){
                 wrappedHandler.fatalError(exception);
             }
